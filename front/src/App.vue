@@ -1,15 +1,28 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <div>
+    <my-method msg="Выплата" class="payout"/>
+    <my-method msg="Баланс" @click="balance"/>
+    <my-method msg="Проверка статуса" @click="status"/>
+  </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import MyMethod from './components/MyMethod.vue'
 
 export default {
   name: 'App',
   components: {
-    HelloWorld
+    'my-method': MyMethod
+  },
+  methods: {
+    balance () {
+      this.$store.dispatch('getBalance');
+      alert('Баланс: ' + this.$store.getters.balance)
+    },
+    status () {
+      this.$store.dispatch('checkStatus');
+      alert('Статус: ' + this.$store.getters.status)
+    }
   }
 }
 </script>
@@ -22,5 +35,7 @@ export default {
   text-align: center;
   color: #2c3e50;
   margin-top: 60px;
+  justify-content: center;
+  display: flex;
 }
 </style>

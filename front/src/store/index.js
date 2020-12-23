@@ -1,12 +1,13 @@
 import { createStore } from 'vuex'
+import payout          from './modules/payout'
+import balance         from './modules/balance'
+import status          from './modules/status'
+
 
 export default createStore({
-  state: {
-  },
-  mutations: {
-  },
-  actions: {
-  },
   modules: {
+    payout,
+    balance,
+    status
   }
 })
