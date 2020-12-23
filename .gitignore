@@ -1,1 +1,7 @@
-/.idea
+
+### IntelliJ IDEA ###
+back/.idea
+back/target
+back/*.iws
+back/*.iml
+back/*.ipr
