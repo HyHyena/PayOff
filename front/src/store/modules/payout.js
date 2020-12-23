@@ -1,23 +1,22 @@
 export default{
     actions: {
         sendPayout (ctx, payoutObj) {
-            ctx.commit('rmStatus')
             console.log(payoutObj)
-            ctx.commit('returnStatus', 'Success')
+            ctx.commit('setStatus', 'Success')
+        },
+        checkStatus (ctx) {
+            ctx.commit('setStatus')
         }
     },
     mutations: {
-        rmStatus(state) {
-            state.statusPayout = '';
-        },
-        returnStatus(state, status) {
-            state.statusPayout = status;
+        setStatus (state, arg) {
+            state.status = arg ? arg : 'Error'
         }
     },
     state: {
-        statusPayout: ''
+        status: 'Пусто'
     },
     getters: {
-        statusPayout: (state) => state.statusPayout
+        status: (state) => state.status
     }
 }

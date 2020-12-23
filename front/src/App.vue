@@ -1,33 +1,29 @@
 <template>
   <div>
-    <my-method msg="Выплата" class="payout"/>
-    <my-method msg="Баланс" @click="balance"/>
-    <my-method msg="Проверка статуса" @click="status"/>
+    <my-balance/>
+    <my-payout/>
+    <my-status/>
   </div>
 </template>
 
 <script>
-import MyMethod from './components/MyMethod.vue'
+import MyPayout from './components/MyPayout.vue'
+import MyBalance from './components/MyBalance'
+import MyStatus from './components/MyStatus'
 
 export default {
   name: 'App',
   components: {
-    'my-method': MyMethod
-  },
-  methods: {
-    balance () {
-      this.$store.dispatch('getBalance');
-      alert('Баланс: ' + this.$store.getters.balance)
-    },
-    status () {
-      this.$store.dispatch('checkStatus');
-      alert('Статус: ' + this.$store.getters.status)
-    }
+    'my-balance': MyBalance,
+    'my-status': MyStatus,
+    'my-payout': MyPayout
   }
 }
 </script>
 
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Jura:wght@300&display=swap');
+
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -37,5 +33,11 @@ export default {
   margin-top: 60px;
   justify-content: center;
   display: flex;
+}
+h2, h4 {
+  font-family: 'Jura', sans-serif;
+}
+h2 {
+  text-align: left;
 }
 </style>

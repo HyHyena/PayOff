@@ -6,11 +6,11 @@ export default{
     },
     mutations: {
         setBalance (state) {
-            state.balance = '120'
+            state.balance = 120
         }
     },
     state: {
-        balance: String
+        balance: null
     },
     getters: {
         balance: (state) => state.balance
