@@ -9,8 +9,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 public class SignatureGenerator {
 
-    @Value("${algorithm}")
-    static String algorithm;
+    static String algorithm = "HmacSHA1";
 
     @SneakyThrows
     public static String generateSignature(String secret, String body, Long salt){

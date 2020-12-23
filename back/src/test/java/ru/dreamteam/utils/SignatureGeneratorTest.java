@@ -2,7 +2,6 @@ package ru.dreamteam.utils;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -17,3 +16,4 @@ class SignatureGeneratorTest {
         Assertions.assertEquals("8Pf+h8uUf664un/Bhz9jmRoxLkw=", signature);
     }
 }
+

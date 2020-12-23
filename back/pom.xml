@@ -9,8 +9,8 @@
         <version>2.3.3.RELEASE</version>
         <relativePath/>
     </parent>
-    <groupId>com.oktasolutions</groupId>
-    <artifactId>messenger</artifactId>
+    <groupId>ru.dreamteam</groupId>
+    <artifactId>payout</artifactId>
     <version>0.1.0</version>
 
     <properties>
@@ -39,7 +39,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>com.oktasolutions.App</mainClass>
+                            <mainClass>ru.dreamteam.Application</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
