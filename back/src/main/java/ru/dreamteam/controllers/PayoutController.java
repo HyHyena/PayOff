@@ -1,6 +1,11 @@
 package ru.dreamteam.controllers;
 
+import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -9,7 +14,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
-import ru.dreamteam.entities.PayoutEntity;
+import ru.dreamteam.entities.PayoutRequestToOurEntity;
+import ru.dreamteam.entities.PayoutRequestToPlatformEntity;
+import ru.dreamteam.entities.ResponsePayoutEntity;
+import ru.dreamteam.services.PayoutService;
+import ru.dreamteam.utils.HeaderGenerator;
+import ru.dreamteam.utils.SignatureGenerator;
+
+import java.util.Random;
+import org.springframework.web.client.RestTemplate;
 import ru.dreamteam.entities.RequestBalanceEntity;
 import ru.dreamteam.entities.RequestStatusEntity;
 import ru.dreamteam.entities.ResponseBalanceEntity;
@@ -19,10 +32,31 @@ import ru.dreamteam.entities.ResponseBalanceEntity;
 @Slf4j
 public class PayoutController {
 
+    private final PayoutService payoutService;
+
+    @Autowired
+    public PayoutController(PayoutService payoutService) {
+        this.payoutService = payoutService;
+    }
+
     @PostMapping(value = "/payout")
-    public String payout(@RequestBody PayoutEntity payoutEntity){
-        log.info(payoutEntity.toString());
-        return "response";
+    public ResponseEntity<?> payout(@RequestBody PayoutRequestToOurEntity payoutRequestToOurEntity){
+        log.info(payoutRequestToOurEntity.toString());
+
+        if (payoutRequestToOurEntity.isEmpty()){
+            return ResponseEntity.badRequest().build();
+        }
+        PayoutRequestToPlatformEntity request = PayoutRequestToPlatformEntity.builder()
+                .amount(payoutRequestToOurEntity.getAmount())
+                .destination(payoutRequestToOurEntity.getCardNumber())
+                .build();
+
+        HttpEntity<?> httpEntity = payoutService.getEntityForRequest(request, PayoutRequestToPlatformEntity.class);
+
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<ResponsePayoutEntity> responsePayoutEntityResponseEntity = restTemplate.postForEntity("url", httpEntity, ResponsePayoutEntity.class);
+
+        return responsePayoutEntityResponseEntity;
     }
 
     @PostMapping(value = "/balance")

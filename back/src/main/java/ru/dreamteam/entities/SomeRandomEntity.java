@@ -4,7 +4,6 @@ import lombok.Data;
 
 @Data
 public class SomeRandomEntity {
-
     Double amount;
     String currency;
     String partnerPayoutId;
@@ -16,6 +15,4 @@ public class SomeRandomEntity {
     String notificationUrl;
     String description;
     String customField;
-
-
 }
