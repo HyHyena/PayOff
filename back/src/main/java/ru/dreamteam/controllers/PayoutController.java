@@ -1,31 +1,18 @@
 package ru.dreamteam.controllers;
 
-import com.google.gson.Gson;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
-import ru.dreamteam.entities.PayoutRequestToOurEntity;
-import ru.dreamteam.entities.PayoutRequestToPlatformEntity;
-import ru.dreamteam.entities.ResponsePayoutEntity;
+import ru.dreamteam.entities.*;
 import ru.dreamteam.services.PayoutService;
-import ru.dreamteam.utils.HeaderGenerator;
-import ru.dreamteam.utils.SignatureGenerator;
-
-import java.util.Random;
-import org.springframework.web.client.RestTemplate;
-import ru.dreamteam.entities.RequestBalanceEntity;
-import ru.dreamteam.entities.RequestStatusEntity;
-import ru.dreamteam.entities.ResponseBalanceEntity;
 
 @RestController
 @RequestMapping(value = "payouts-gateway")
@@ -34,14 +21,18 @@ public class PayoutController {
 
     private final PayoutService payoutService;
 
+    @Value("${external_host}")
+    String externalHost;
+
     @Autowired
     public PayoutController(PayoutService payoutService) {
         this.payoutService = payoutService;
     }
 
     @PostMapping(value = "/payout")
+    @ApiOperation(value = "Payout operation", response = ResponsePayoutEntity.class)
     public ResponseEntity<?> payout(@RequestBody PayoutRequestToOurEntity payoutRequestToOurEntity){
-        log.info(payoutRequestToOurEntity.toString());
+        log.info("Payout for amount: " + payoutRequestToOurEntity.getAmount() + " has been requested");
 
         if (payoutRequestToOurEntity.isEmpty()){
             return ResponseEntity.badRequest().build();
@@ -54,51 +45,41 @@ public class PayoutController {
         HttpEntity<?> httpEntity = payoutService.getEntityForRequest(request, PayoutRequestToPlatformEntity.class);
 
         RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<ResponsePayoutEntity> responsePayoutEntityResponseEntity = restTemplate.postForEntity("url", httpEntity, ResponsePayoutEntity.class);
+        ResponseEntity<ResponsePayoutEntity> responsePayoutEntityResponseEntity = restTemplate.postForEntity(externalHost, httpEntity, ResponsePayoutEntity.class);
 
         return responsePayoutEntityResponseEntity;
     }
 
     @PostMapping(value = "/balance")
+    @ApiOperation(value = "Balance fetching operation", response = ResponseBalanceEntity.class)
     public ResponseEntity<?> balance(){
+        log.info("Balance info has been requested");
+
+        RequestBalanceEntity request = new RequestBalanceEntity();
+        request.setAccountId("");
+
+        HttpEntity<?> httpEntity = payoutService.getEntityForRequest(request, RequestBalanceEntity.class);
+
         RestTemplate restTemplate = new RestTemplate();
-
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.add("X-Signature", "");
-        httpHeaders.add("X-Partner-Api-Key", "");
-        httpHeaders.add("X-Salt", "");
-        httpHeaders.add("Content-Type", "application/json");
-
-        RequestBalanceEntity requestBalanceEntity = new RequestBalanceEntity();
-        requestBalanceEntity.setAccountId("");
-
-        HttpEntity<RequestBalanceEntity> requestEntity =
-                new HttpEntity<>(requestBalanceEntity, httpHeaders);
-
         ResponseEntity<ResponseBalanceEntity> responseEntity =
-                restTemplate.postForEntity("", requestEntity, ResponseBalanceEntity.class);
+                restTemplate.postForEntity(externalHost, httpEntity, ResponseBalanceEntity.class);
 
         return responseEntity;
     }
 
     @PostMapping(value = "/status")
+    @ApiOperation(value = "Status fetching operation", response = ResponseStatusEntity.class)
     public ResponseEntity<?> status(){
+        log.info("Status has been requested");
+
+        RequestStatusEntity request = new RequestStatusEntity();
+        request.setPartnerPayoutId("");
+
+        HttpEntity<?> httpEntity = payoutService.getEntityForRequest(request, RequestStatusEntity.class);
+
         RestTemplate restTemplate = new RestTemplate();
-
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.add("X-Signature", "");
-        httpHeaders.add("X-Partner-Api-Key", "");
-        httpHeaders.add("X-Salt", "");
-        httpHeaders.add("Content-Type", "application/json");
-
-        RequestStatusEntity requestStatusEntity = new RequestStatusEntity();
-        requestStatusEntity.setPartnerPayoutId("");
-
-        HttpEntity<RequestStatusEntity> requestEntity =
-                new HttpEntity<>(requestStatusEntity, httpHeaders);
-
-        ResponseEntity<RequestStatusEntity> responseEntity =
-                restTemplate.postForEntity("", requestEntity, RequestStatusEntity.class);
+        ResponseEntity<ResponseStatusEntity> responseEntity =
+                restTemplate.postForEntity(externalHost, httpEntity, ResponseStatusEntity.class);
 
         return responseEntity;
     }
