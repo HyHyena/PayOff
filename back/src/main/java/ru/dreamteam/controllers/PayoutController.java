@@ -55,11 +55,8 @@ public class PayoutController {
 
     @PostMapping(value = "/balance")
     @ApiOperation(value = "Balance fetching operation", response = ResponseBalanceEntity.class)
-    public ResponseEntity<?> balance(){
+    public ResponseEntity<?> balance(@RequestBody RequestBalanceEntity request){
         log.info("Balance info has been requested");
-
-        RequestBalanceEntity request = new RequestBalanceEntity();
-        request.setAccountId("");
 
         HttpEntity<?> httpEntity = payoutService.getEntityForRequest(request, RequestBalanceEntity.class);
 
@@ -74,11 +71,8 @@ public class PayoutController {
 
     @PostMapping(value = "/status")
     @ApiOperation(value = "Status fetching operation", response = ResponseStatusEntity.class)
-    public ResponseEntity<?> status(){
+    public ResponseEntity<?> status(@RequestBody RequestStatusEntity request){
         log.info("Status has been requested");
-
-        RequestStatusEntity request = new RequestStatusEntity();
-        request.setPartnerPayoutId("");
 
         HttpEntity<?> httpEntity = payoutService.getEntityForRequest(request, RequestStatusEntity.class);
 
