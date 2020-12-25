@@ -1,7 +1,7 @@
 export default{
     actions: {
         sendPayout (ctx, payoutObj) {
-            return fetch('/payouts-gateway/payout', {
+            return fetch('/payoff/payouts-gateway/payout', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json;charset=utf-8'
@@ -23,7 +23,7 @@ export default{
                 });
         },
         checkStatus (ctx) {
-            return fetch('/payouts-gateway/status', {
+            return fetch('/payoff/payouts-gateway/status', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json;charset=utf-8'

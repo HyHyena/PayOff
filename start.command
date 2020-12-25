@@ -1,6 +1,6 @@
 path="`dirname \"$0\"`"
 cd "$path/front"
-npm install
+npm i
 npm run build
 cd ..
 cd "$path/config"

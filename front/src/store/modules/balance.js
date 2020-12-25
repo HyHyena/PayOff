@@ -1,7 +1,7 @@
 export default{
     actions: {
         getBalance (ctx) {
-            return fetch('/payouts-gateway/balance', {
+            return fetch('/payoff/payouts-gateway/balance', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json;charset=utf-8'
