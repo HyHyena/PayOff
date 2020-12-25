@@ -5,3 +5,33 @@ back/target
 back/*.iws
 back/*.iml
 back/*.ipr
+
+/.idea
+/.DS_Store
+/front/.DS_Store
+front/package-lock.json
+/front/node_modules
+front/dist
+/dist
+
+
+# local env files
+.env.local
+.env.*.local
+
+# Log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Editor directories and files
+.idea
+front/.idea
+.vscode
+front/.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
