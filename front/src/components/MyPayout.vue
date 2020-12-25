@@ -42,7 +42,7 @@ export default {
       if (this.pan) {
         if (this.pan.length === 19 && this.amount.length > 0) {
           this.$store.dispatch('sendPayout', {
-            pan: this.pan,
+            pan: this.pan.match(/\d{4}/gm).reduce((acc, el) => acc += el ,''),
             amount: this.amount
           })
         }
