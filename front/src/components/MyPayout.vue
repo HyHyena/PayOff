@@ -39,11 +39,13 @@ export default {
   },
   methods: {
     onClick() {
-      if (this.pan.length === 19 && this.amount.length > 0) {
-        this.$store.dispatch('sendPayout', {
-          pan: this.pan,
-          amount: this.amount
-        })
+      if (this.pan) {
+        if (this.pan.length === 19 && this.amount.length > 0) {
+          this.$store.dispatch('sendPayout', {
+            pan: this.pan,
+            amount: this.amount
+          })
+        }
       } else {
         alert('Введены неверные данные')
         console.log(this.pan, this.amount)
