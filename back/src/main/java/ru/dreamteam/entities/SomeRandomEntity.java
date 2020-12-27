@@ -8,8 +8,8 @@ public class SomeRandomEntity {
     String currency;
     String partnerPayoutId;
     String destinationId;
-    Integer accountId;
-    Integer accountGroupId;
+    Long accountId;
+    Long accountGroupId;
     String method;
     String destination;
     String notificationUrl;

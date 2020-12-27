@@ -23,7 +23,13 @@ public class PayoutController {
     private final PayoutService payoutService;
 
     @Value("${external_host}")
-    String externalHost;
+    private String externalHost;
+
+    @Value("${partnerPayoutId}")
+    private String partnerPayoutId;
+
+    @Value("${accountId}")
+    private Long accountId;
 
     @Autowired
     public PayoutController(PayoutService payoutService) {
@@ -41,16 +47,22 @@ public class PayoutController {
         PayoutRequestToPlatformEntity request = PayoutRequestToPlatformEntity.builder()
                 .amount(payoutRequestToOurEntity.getAmount())
                 .destination(payoutRequestToOurEntity.getCardNumber())
+                .partnerPayoutId(partnerPayoutId)
+                .method("card_ru")
+                .accountId(accountId)
                 .build();
 
         HttpEntity<?> httpEntity = payoutService.getEntityForRequest(request, PayoutRequestToPlatformEntity.class);
 
         RestTemplate restTemplate = new RestTemplate();
 //        How we would normally do
-//        ResponseEntity<ResponsePayoutEntity> responsePayoutEntityResponseEntity = restTemplate.postForEntity(externalHost, httpEntity, ResponsePayoutEntity.class);
+        ResponseEntity<ResponsePayoutEntity> responsePayoutEntityResponseEntity = restTemplate.postForEntity(externalHost, httpEntity, ResponsePayoutEntity.class);
 
-        return new ResponseEntity<>(ResponsePayoutEntity.builder().id("1111000022223333")
-                .status("ACCEPTED").build(), HttpStatus.OK);
+        return  responsePayoutEntityResponseEntity;
+
+//        hollow
+//        return new ResponseEntity<>(ResponsePayoutEntity.builder().id("1111000022223333")
+//                .status("ACCEPTED").build(), HttpStatus.OK);
     }
 
     @PostMapping(value = "/balance")
@@ -62,11 +74,14 @@ public class PayoutController {
 
         RestTemplate restTemplate = new RestTemplate();
 //        How we would normally do
-//        ResponseEntity<ResponseBalanceEntity> responseEntity =
-//                restTemplate.postForEntity(externalHost, httpEntity, ResponseBalanceEntity.class);
+        ResponseEntity<ResponseBalanceEntity> responseEntity =
+                restTemplate.postForEntity(externalHost, httpEntity, ResponseBalanceEntity.class);
 
-        return new ResponseEntity<>(ResponseBalanceEntity.builder().accountEntity(AccountEntity.builder()
-                .balance(1000000000L).build()).status("ACCEPTED").build(), HttpStatus.OK);
+        return responseEntity;
+
+//        hollow
+//        return new ResponseEntity<>(ResponseBalanceEntity.builder().accountEntity(AccountEntity.builder()
+//                .balance(1000000000L).build()).status("ACCEPTED").build(), HttpStatus.OK);
     }
 
     @PostMapping(value = "/status")
@@ -78,10 +93,12 @@ public class PayoutController {
 
         RestTemplate restTemplate = new RestTemplate();
 //        How we would normally do
-//        ResponseEntity<ResponseStatusEntity> responseEntity =
-//                restTemplate.postForEntity(externalHost, httpEntity, ResponseStatusEntity.class);
+        ResponseEntity<ResponseStatusEntity> responseEntity =
+                restTemplate.postForEntity(externalHost, httpEntity, ResponseStatusEntity.class);
+        return responseEntity;
 
-        return new ResponseEntity<>(ResponseStatusEntity.builder().status("ACCEPTED").build(), HttpStatus.OK);
+//        hollow
+//        return new ResponseEntity<>(ResponseStatusEntity.builder().status("ACCEPTED").build(), HttpStatus.OK);
     }
 
 }
