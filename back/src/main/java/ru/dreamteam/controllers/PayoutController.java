@@ -31,6 +31,15 @@ public class PayoutController {
     @Value("${accountId}")
     private Long accountId;
 
+    @Value("${endpoint.payout}")
+    private String endpointPayout;
+
+    @Value("${endpoint.balance}")
+    private String endpointBalance;
+
+    @Value("${endpoint.status}")
+    private String endpointStatus;
+
     @Autowired
     public PayoutController(PayoutService payoutService) {
         this.payoutService = payoutService;
@@ -56,7 +65,8 @@ public class PayoutController {
 
         RestTemplate restTemplate = new RestTemplate();
 //        How we would normally do
-        ResponseEntity<ResponsePayoutEntity> responsePayoutEntityResponseEntity = restTemplate.postForEntity(externalHost, httpEntity, ResponsePayoutEntity.class);
+        ResponseEntity<ResponsePayoutEntity> responsePayoutEntityResponseEntity =
+                restTemplate.postForEntity(externalHost + endpointPayout, httpEntity, ResponsePayoutEntity.class);
 
         return  responsePayoutEntityResponseEntity;
 
@@ -75,7 +85,7 @@ public class PayoutController {
         RestTemplate restTemplate = new RestTemplate();
 //        How we would normally do
         ResponseEntity<ResponseBalanceEntity> responseEntity =
-                restTemplate.postForEntity(externalHost, httpEntity, ResponseBalanceEntity.class);
+                restTemplate.postForEntity(externalHost + endpointBalance, httpEntity, ResponseBalanceEntity.class);
 
         return responseEntity;
 
@@ -94,7 +104,7 @@ public class PayoutController {
         RestTemplate restTemplate = new RestTemplate();
 //        How we would normally do
         ResponseEntity<ResponseStatusEntity> responseEntity =
-                restTemplate.postForEntity(externalHost, httpEntity, ResponseStatusEntity.class);
+                restTemplate.postForEntity(externalHost + endpointStatus, httpEntity, ResponseStatusEntity.class);
         return responseEntity;
 
 //        hollow
