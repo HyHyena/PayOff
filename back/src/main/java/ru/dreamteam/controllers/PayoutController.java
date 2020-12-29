@@ -20,6 +20,7 @@ import ru.dreamteam.services.PayoutService;
 public class PayoutController {
 
     private final PayoutService payoutService;
+    private final RestTemplate restTemplate;
 
     @Value("${external_host}")
     private String externalHost;
@@ -40,8 +41,9 @@ public class PayoutController {
     private String endpointStatus;
 
     @Autowired
-    public PayoutController(PayoutService payoutService) {
+    public PayoutController(PayoutService payoutService, RestTemplate restTemplate) {
         this.payoutService = payoutService;
+        this.restTemplate = restTemplate;
     }
 
     @PostMapping(value = "/payout")
@@ -62,16 +64,11 @@ public class PayoutController {
 
         HttpEntity<?> httpEntity = payoutService.getEntityForRequest(request, PayoutRequestToPlatformDTO.class);
 
-        RestTemplate restTemplate = new RestTemplate();
 //        How we would normally do
         ResponseEntity<ResponsePayoutDTO> responsePayoutEntityResponseEntity =
                 restTemplate.postForEntity(externalHost + endpointPayout, httpEntity, ResponsePayoutDTO.class);
 
         return  responsePayoutEntityResponseEntity;
-
-//        hollow
-//        return new ResponseEntity<>(ResponsePayoutEntity.builder().id("1111000022223333")
-//                .status("ACCEPTED").build(), HttpStatus.OK);
     }
 
     @PostMapping(value = "/balance")
@@ -81,16 +78,11 @@ public class PayoutController {
 
         HttpEntity<?> httpEntity = payoutService.getEntityForRequest(request, RequestBalanceDTO.class);
 
-        RestTemplate restTemplate = new RestTemplate();
 //        How we would normally do
         ResponseEntity<ResponseBalanceDTO> responseEntity =
                 restTemplate.postForEntity(externalHost + endpointBalance, httpEntity, ResponseBalanceDTO.class);
 
         return responseEntity;
-
-//        hollow
-//        return new ResponseEntity<>(ResponseBalanceEntity.builder().accountEntity(AccountEntity.builder()
-//                .balance(1000000000L).build()).status("ACCEPTED").build(), HttpStatus.OK);
     }
 
     @PostMapping(value = "/status")
@@ -100,14 +92,10 @@ public class PayoutController {
 
         HttpEntity<?> httpEntity = payoutService.getEntityForRequest(request, RequestStatusDTO.class);
 
-        RestTemplate restTemplate = new RestTemplate();
 //        How we would normally do
         ResponseEntity<ResponseStatusDTO> responseEntity =
                 restTemplate.postForEntity(externalHost + endpointStatus, httpEntity, ResponseStatusDTO.class);
         return responseEntity;
-
-//        hollow
-//        return new ResponseEntity<>(ResponseStatusEntity.builder().status("ACCEPTED").build(), HttpStatus.OK);
     }
 
 }
