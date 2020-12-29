@@ -1,11 +1,11 @@
-package ru.dreamteam.entities;
+package ru.dreamteam.models;
 
 import lombok.Builder;
 import lombok.Data;
 
 @Data
 @Builder
-public class AccountEntity {
+public class Account {
 
     private String id;
     private String currency;

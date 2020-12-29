@@ -1,11 +1,11 @@
-package ru.dreamteam.entities;
+package ru.dreamteam.models;
 
 import lombok.Builder;
 import lombok.Data;
 
 @Data
 @Builder
-public class ResponsePayoutEntity {
+public class ResponsePayoutDTO {
 
     private String id;
     private String partnerPayoutId;
@@ -15,6 +15,6 @@ public class ResponsePayoutEntity {
     private String destination;
     private String status;
     private String date;
-    private ErrorEntity errorEntity;
+    private Error error;
 
 }

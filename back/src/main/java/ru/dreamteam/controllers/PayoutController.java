@@ -5,14 +5,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
-import ru.dreamteam.entities.*;
+import ru.dreamteam.models.*;
 import ru.dreamteam.services.PayoutService;
 
 @RestController
@@ -46,27 +45,27 @@ public class PayoutController {
     }
 
     @PostMapping(value = "/payout")
-    @ApiOperation(value = "Payout operation", response = ResponsePayoutEntity.class)
-    public ResponseEntity<?> payout(@RequestBody PayoutRequestToOurEntity payoutRequestToOurEntity){
-        log.info("Payout for amount: " + payoutRequestToOurEntity.getAmount() + " has been requested");
+    @ApiOperation(value = "Payout operation", response = ResponsePayoutDTO.class)
+    public ResponseEntity<?> payout(@RequestBody PayoutRequestToOurDTO payoutRequestToOurDTO){
+        log.info("Payout for amount: " + payoutRequestToOurDTO.getAmount() + " has been requested");
 
-        if (payoutRequestToOurEntity.isEmpty()){
+        if (payoutRequestToOurDTO.isEmpty()){
             return ResponseEntity.badRequest().build();
         }
-        PayoutRequestToPlatformEntity request = PayoutRequestToPlatformEntity.builder()
-                .amount(payoutRequestToOurEntity.getAmount())
-                .destination(payoutRequestToOurEntity.getCardNumber())
+        PayoutRequestToPlatformDTO request = PayoutRequestToPlatformDTO.builder()
+                .amount(payoutRequestToOurDTO.getAmount())
+                .destination(payoutRequestToOurDTO.getCardNumber())
                 .partnerPayoutId(partnerPayoutId)
                 .method("card_ru")
                 .accountId(accountId)
                 .build();
 
-        HttpEntity<?> httpEntity = payoutService.getEntityForRequest(request, PayoutRequestToPlatformEntity.class);
+        HttpEntity<?> httpEntity = payoutService.getEntityForRequest(request, PayoutRequestToPlatformDTO.class);
 
         RestTemplate restTemplate = new RestTemplate();
 //        How we would normally do
-        ResponseEntity<ResponsePayoutEntity> responsePayoutEntityResponseEntity =
-                restTemplate.postForEntity(externalHost + endpointPayout, httpEntity, ResponsePayoutEntity.class);
+        ResponseEntity<ResponsePayoutDTO> responsePayoutEntityResponseEntity =
+                restTemplate.postForEntity(externalHost + endpointPayout, httpEntity, ResponsePayoutDTO.class);
 
         return  responsePayoutEntityResponseEntity;
 
@@ -76,16 +75,16 @@ public class PayoutController {
     }
 
     @PostMapping(value = "/balance")
-    @ApiOperation(value = "Balance fetching operation", response = ResponseBalanceEntity.class)
-    public ResponseEntity<?> balance(@RequestBody RequestBalanceEntity request){
+    @ApiOperation(value = "Balance fetching operation", response = ResponseBalanceDTO.class)
+    public ResponseEntity<?> balance(@RequestBody RequestBalanceDTO request){
         log.info("Balance info has been requested");
 
-        HttpEntity<?> httpEntity = payoutService.getEntityForRequest(request, RequestBalanceEntity.class);
+        HttpEntity<?> httpEntity = payoutService.getEntityForRequest(request, RequestBalanceDTO.class);
 
         RestTemplate restTemplate = new RestTemplate();
 //        How we would normally do
-        ResponseEntity<ResponseBalanceEntity> responseEntity =
-                restTemplate.postForEntity(externalHost + endpointBalance, httpEntity, ResponseBalanceEntity.class);
+        ResponseEntity<ResponseBalanceDTO> responseEntity =
+                restTemplate.postForEntity(externalHost + endpointBalance, httpEntity, ResponseBalanceDTO.class);
 
         return responseEntity;
 
@@ -95,16 +94,16 @@ public class PayoutController {
     }
 
     @PostMapping(value = "/status")
-    @ApiOperation(value = "Status fetching operation", response = ResponseStatusEntity.class)
-    public ResponseEntity<?> status(@RequestBody RequestStatusEntity request){
+    @ApiOperation(value = "Status fetching operation", response = ResponseStatusDTO.class)
+    public ResponseEntity<?> status(@RequestBody RequestStatusDTO request){
         log.info("Status has been requested");
 
-        HttpEntity<?> httpEntity = payoutService.getEntityForRequest(request, RequestStatusEntity.class);
+        HttpEntity<?> httpEntity = payoutService.getEntityForRequest(request, RequestStatusDTO.class);
 
         RestTemplate restTemplate = new RestTemplate();
 //        How we would normally do
-        ResponseEntity<ResponseStatusEntity> responseEntity =
-                restTemplate.postForEntity(externalHost + endpointStatus, httpEntity, ResponseStatusEntity.class);
+        ResponseEntity<ResponseStatusDTO> responseEntity =
+                restTemplate.postForEntity(externalHost + endpointStatus, httpEntity, ResponseStatusDTO.class);
         return responseEntity;
 
 //        hollow

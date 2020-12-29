@@ -4,7 +4,7 @@ import lombok.SneakyThrows;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import ru.dreamteam.entities.Json;
+import ru.dreamteam.models.Json;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;

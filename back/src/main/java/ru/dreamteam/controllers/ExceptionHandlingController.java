@@ -6,7 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
-import ru.dreamteam.entities.ErrorEntity;
+import ru.dreamteam.models.Error;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -22,7 +22,7 @@ public class ExceptionHandlingController {
           log.error("Your application is having a problem. The event: " + ex.getLocalizedMessage());
           log.error("Bad class that threw exception: " + ex.getClass());
           log.error("Someone tried to connect to this uri: " + req.getRequestURI() + " with " +  req.getMethod() + " method");
-          return new ResponseEntity<>(ErrorEntity.builder().message("error occurred").build(), HttpStatus.OK);
+          return new ResponseEntity<>(Error.builder().message("error occurred").build(), HttpStatus.OK);
     }
 
 }

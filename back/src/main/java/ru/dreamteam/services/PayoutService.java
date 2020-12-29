@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
-import ru.dreamteam.entities.Json;
+import ru.dreamteam.models.Json;
 import ru.dreamteam.utils.HeaderGenerator;
 import ru.dreamteam.utils.SignatureGenerator;
 
