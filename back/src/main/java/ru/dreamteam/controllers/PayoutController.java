@@ -3,7 +3,6 @@ package ru.dreamteam.controllers;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -11,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.dreamteam.models.*;
+import ru.dreamteam.properties.PlatformEndpointPropertiesHolder;
+import ru.dreamteam.properties.PlatformPropertiesHolder;
 import ru.dreamteam.services.PayoutService;
 import ru.dreamteam.services.RestTemplateCallService;
 
@@ -22,28 +23,19 @@ public class PayoutController {
     private final PayoutService payoutService;
     private final RestTemplateCallService restTemplateCallService;
 
-    @Value("${external_host}")
-    private String externalHost;
-
-    @Value("${partnerPayoutId}")
-    private String partnerPayoutId;
-
-    @Value("${accountId}")
-    private Long accountId;
-
-    @Value("${endpoint.payout}")
-    private String endpointPayout;
-
-    @Value("${endpoint.balance}")
-    private String endpointBalance;
-
-    @Value("${endpoint.status}")
-    private String endpointStatus;
+    private final PlatformEndpointPropertiesHolder endpointPropertiesHolder;
+    private final PlatformPropertiesHolder propertiesHolder;
 
     @Autowired
-    public PayoutController(PayoutService payoutService, RestTemplateCallService restTemplateCallService) {
+
+    public PayoutController(PayoutService payoutService,
+                            RestTemplateCallService restTemplateCallService,
+                            PlatformEndpointPropertiesHolder endpointPropertiesHolder,
+                            PlatformPropertiesHolder propertiesHolder) {
         this.payoutService = payoutService;
         this.restTemplateCallService = restTemplateCallService;
+        this.endpointPropertiesHolder = endpointPropertiesHolder;
+        this.propertiesHolder = propertiesHolder;
     }
 
     @PostMapping(value = "/payout")
@@ -57,15 +49,16 @@ public class PayoutController {
         PayoutRequestToPlatformDTO request = PayoutRequestToPlatformDTO.builder()
                 .amount(payoutRequestToOurDTO.getAmount())
                 .destination(payoutRequestToOurDTO.getCardNumber())
-                .partnerPayoutId(partnerPayoutId)
+                .partnerPayoutId(propertiesHolder.getPartnerPayoutId())
                 .method("card_ru")
-                .accountId(accountId)
+                .accountId(propertiesHolder.getAccountId())
                 .build();
 
         HttpEntity<?> httpEntity = payoutService.getEntityForRequest(request, PayoutRequestToPlatformDTO.class);
 
+        //        How we would normally do
         ResponseEntity<?> responsePayoutEntityResponseEntity =
-                restTemplateCallService.postCallAtPlatform(externalHost + endpointPayout, httpEntity, ResponsePayoutDTO.class);
+                restTemplateCallService.postCallAtPlatform(propertiesHolder.getExternalHost() + endpointPropertiesHolder.getPayout(), httpEntity, ResponsePayoutDTO.class);
 
         return responsePayoutEntityResponseEntity;
     }
@@ -78,7 +71,7 @@ public class PayoutController {
         HttpEntity<?> httpEntity = payoutService.getEntityForRequest(request, RequestBalanceDTO.class);
 
         ResponseEntity<?> responseEntity =
-                restTemplateCallService.postCallAtPlatform(externalHost + endpointBalance, httpEntity, ResponseBalanceDTO.class);
+                restTemplateCallService.postCallAtPlatform(propertiesHolder.getExternalHost() + endpointPropertiesHolder.getBalance(), httpEntity, ResponseBalanceDTO.class);
 
         return responseEntity;
     }
@@ -91,7 +84,7 @@ public class PayoutController {
         HttpEntity<?> httpEntity = payoutService.getEntityForRequest(request, RequestStatusDTO.class);
 
         ResponseEntity<?> responseEntity =
-                restTemplateCallService.postCallAtPlatform(externalHost + endpointStatus, httpEntity, ResponseStatusDTO.class);
+                restTemplateCallService.postCallAtPlatform(propertiesHolder.getExternalHost() + endpointPropertiesHolder.getBalance(), httpEntity, ResponseStatusDTO.class);
         return responseEntity;
     }
 

@@ -7,7 +7,7 @@ import org.springframework.web.client.RestTemplate;
 
 @Configuration
 @Profile("prod")
-public class ProgConfig {
+public class ProdConfig {
     @Bean
     public RestTemplate restTemplate() {
         return new RestTemplate();
