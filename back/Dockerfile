@@ -11,5 +11,5 @@ RUN mvn -f /home/app/pom.xml clean package
 #
 FROM openjdk:11
 EXPOSE 8080
-COPY target/*.jar /payout.jar
+COPY --from=build /home/app/target/*.jar /payout.jar
 CMD ["java", "-jar", "payout.jar"]
