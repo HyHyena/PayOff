@@ -3,17 +3,17 @@ package ru.dreamteam.controllers;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.RestTemplate;
-import ru.dreamteam.entities.*;
+import ru.dreamteam.models.*;
+import ru.dreamteam.properties.PlatformEndpointPropertiesHolder;
+import ru.dreamteam.properties.PlatformPropertiesHolder;
 import ru.dreamteam.services.PayoutService;
+import ru.dreamteam.services.RestTemplateCallService;
 
 @RestController
 @RequestMapping(value = "payouts-gateway")
@@ -21,94 +21,71 @@ import ru.dreamteam.services.PayoutService;
 public class PayoutController {
 
     private final PayoutService payoutService;
+    private final RestTemplateCallService restTemplateCallService;
 
-    @Value("${external_host}")
-    private String externalHost;
-
-    @Value("${partnerPayoutId}")
-    private String partnerPayoutId;
-
-    @Value("${accountId}")
-    private Long accountId;
-
-    @Value("${endpoint.payout}")
-    private String endpointPayout;
-
-    @Value("${endpoint.balance}")
-    private String endpointBalance;
-
-    @Value("${endpoint.status}")
-    private String endpointStatus;
+    private final PlatformEndpointPropertiesHolder endpointPropertiesHolder;
+    private final PlatformPropertiesHolder propertiesHolder;
 
     @Autowired
-    public PayoutController(PayoutService payoutService) {
+
+    public PayoutController(PayoutService payoutService,
+                            RestTemplateCallService restTemplateCallService,
+                            PlatformEndpointPropertiesHolder endpointPropertiesHolder,
+                            PlatformPropertiesHolder propertiesHolder) {
         this.payoutService = payoutService;
+        this.restTemplateCallService = restTemplateCallService;
+        this.endpointPropertiesHolder = endpointPropertiesHolder;
+        this.propertiesHolder = propertiesHolder;
     }
 
     @PostMapping(value = "/payout")
-    @ApiOperation(value = "Payout operation", response = ResponsePayoutEntity.class)
-    public ResponseEntity<?> payout(@RequestBody PayoutRequestToOurEntity payoutRequestToOurEntity){
-        log.info("Payout for amount: " + payoutRequestToOurEntity.getAmount() + " has been requested");
+    @ApiOperation(value = "Payout operation", response = ResponsePayoutDTO.class)
+    public ResponseEntity<?> payout(@RequestBody PayoutRequestToOurDTO payoutRequestToOurDTO){
+        log.info("Payout for amount: " + payoutRequestToOurDTO.getAmount() + " has been requested");
 
-        if (payoutRequestToOurEntity.isEmpty()){
+        if (payoutRequestToOurDTO.isEmpty()){
             return ResponseEntity.badRequest().build();
         }
-        PayoutRequestToPlatformEntity request = PayoutRequestToPlatformEntity.builder()
-                .amount(payoutRequestToOurEntity.getAmount())
-                .destination(payoutRequestToOurEntity.getCardNumber())
-                .partnerPayoutId(partnerPayoutId)
+        PayoutRequestToPlatformDTO request = PayoutRequestToPlatformDTO.builder()
+                .amount(payoutRequestToOurDTO.getAmount())
+                .destination(payoutRequestToOurDTO.getCardNumber())
+                .partnerPayoutId(propertiesHolder.getPartnerPayoutId())
                 .method("card_ru")
-                .accountId(accountId)
+                .accountId(propertiesHolder.getAccountId())
                 .build();
 
-        HttpEntity<?> httpEntity = payoutService.getEntityForRequest(request, PayoutRequestToPlatformEntity.class);
+        HttpEntity<?> httpEntity = payoutService.getEntityForRequest(request, PayoutRequestToPlatformDTO.class);
 
-        RestTemplate restTemplate = new RestTemplate();
-//        How we would normally do
-        ResponseEntity<ResponsePayoutEntity> responsePayoutEntityResponseEntity =
-                restTemplate.postForEntity(externalHost + endpointPayout, httpEntity, ResponsePayoutEntity.class);
+        //        How we would normally do
+        ResponseEntity<?> responsePayoutEntityResponseEntity =
+                restTemplateCallService.postCallAtPlatform(propertiesHolder.getExternalHost() + endpointPropertiesHolder.getPayout(), httpEntity, ResponsePayoutDTO.class);
 
-        return  responsePayoutEntityResponseEntity;
-
-//        hollow
-//        return new ResponseEntity<>(ResponsePayoutEntity.builder().id("1111000022223333")
-//                .status("ACCEPTED").build(), HttpStatus.OK);
+        return responsePayoutEntityResponseEntity;
     }
 
     @PostMapping(value = "/balance")
-    @ApiOperation(value = "Balance fetching operation", response = ResponseBalanceEntity.class)
-    public ResponseEntity<?> balance(@RequestBody RequestBalanceEntity request){
+    @ApiOperation(value = "Balance fetching operation", response = ResponseBalanceDTO.class)
+    public ResponseEntity<?> balance(@RequestBody RequestBalanceDTO request){
         log.info("Balance info has been requested");
 
-        HttpEntity<?> httpEntity = payoutService.getEntityForRequest(request, RequestBalanceEntity.class);
+        HttpEntity<?> httpEntity = payoutService.getEntityForRequest(request, RequestBalanceDTO.class);
 
-        RestTemplate restTemplate = new RestTemplate();
-//        How we would normally do
-        ResponseEntity<ResponseBalanceEntity> responseEntity =
-                restTemplate.postForEntity(externalHost + endpointBalance, httpEntity, ResponseBalanceEntity.class);
+        ResponseEntity<?> responseEntity =
+                restTemplateCallService.postCallAtPlatform(propertiesHolder.getExternalHost() + endpointPropertiesHolder.getBalance(), httpEntity, ResponseBalanceDTO.class);
 
         return responseEntity;
-
-//        hollow
-//        return new ResponseEntity<>(ResponseBalanceEntity.builder().accountEntity(AccountEntity.builder()
-//                .balance(1000000000L).build()).status("ACCEPTED").build(), HttpStatus.OK);
     }
 
     @PostMapping(value = "/status")
-    @ApiOperation(value = "Status fetching operation", response = ResponseStatusEntity.class)
-    public ResponseEntity<?> status(@RequestBody RequestStatusEntity request){
+    @ApiOperation(value = "Status fetching operation", response = ResponseStatusDTO.class)
+    public ResponseEntity<?> status(@RequestBody RequestStatusDTO request){
         log.info("Status has been requested");
 
-        HttpEntity<?> httpEntity = payoutService.getEntityForRequest(request, RequestStatusEntity.class);
+        HttpEntity<?> httpEntity = payoutService.getEntityForRequest(request, RequestStatusDTO.class);
 
-        RestTemplate restTemplate = new RestTemplate();
-//        How we would normally do
-        ResponseEntity<ResponseStatusEntity> responseEntity =
-                restTemplate.postForEntity(externalHost + endpointStatus, httpEntity, ResponseStatusEntity.class);
+        ResponseEntity<?> responseEntity =
+                restTemplateCallService.postCallAtPlatform(propertiesHolder.getExternalHost() + endpointPropertiesHolder.getBalance(), httpEntity, ResponseStatusDTO.class);
         return responseEntity;
-
-//        hollow
-//        return new ResponseEntity<>(ResponseStatusEntity.builder().status("ACCEPTED").build(), HttpStatus.OK);
     }
 
 }

@@ -1,7 +1,7 @@
-version: "3"
+version: "3.9"
 services:
   back:
-    image: hyhyena/payout:latest
+    build: ../back
     ports:
       - 8080:8080
 

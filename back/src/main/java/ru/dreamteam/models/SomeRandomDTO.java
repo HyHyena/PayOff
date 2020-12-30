@@ -1,9 +1,9 @@
-package ru.dreamteam.entities;
+package ru.dreamteam.models;
 
 import lombok.Data;
 
 @Data
-public class SomeRandomEntity {
+public class SomeRandomDTO {
     Double amount;
     String currency;
     String partnerPayoutId;

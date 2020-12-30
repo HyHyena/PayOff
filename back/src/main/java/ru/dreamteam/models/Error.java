@@ -1,11 +1,11 @@
-package ru.dreamteam.entities;
+package ru.dreamteam.models;
 
 import lombok.Builder;
 import lombok.Data;
 
 @Data
 @Builder
-public class ErrorEntity {
+public class Error {
     private String code;
     private String message;
 }

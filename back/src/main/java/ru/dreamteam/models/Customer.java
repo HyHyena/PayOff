@@ -1,4 +1,4 @@
-package ru.dreamteam.entities;
+package ru.dreamteam.models;
 
 import lombok.Data;
 

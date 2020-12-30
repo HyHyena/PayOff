@@ -1,9 +1,9 @@
-package ru.dreamteam.entities;
+package ru.dreamteam.models;
 
 import lombok.Data;
 
 @Data
-public class PayoutRequestToOurEntity implements Json {
+public class PayoutRequestToOurDTO implements Json {
     private String cardNumber;
     private String amount;
 

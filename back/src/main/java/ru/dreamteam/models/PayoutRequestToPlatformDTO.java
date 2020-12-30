@@ -1,11 +1,11 @@
-package ru.dreamteam.entities;
+package ru.dreamteam.models;
 
 import lombok.Builder;
 import lombok.Data;
 
 @Data
 @Builder
-public class PayoutRequestToPlatformEntity implements Json{
+public class PayoutRequestToPlatformDTO implements Json{
     private String amount;
     private String currency;
     private String partnerPayoutId;
