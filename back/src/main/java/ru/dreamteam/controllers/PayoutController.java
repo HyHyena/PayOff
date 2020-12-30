@@ -10,9 +10,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.RestTemplate;
 import ru.dreamteam.models.*;
 import ru.dreamteam.services.PayoutService;
+import ru.dreamteam.services.RestTemplateCallService;
 
 @RestController
 @RequestMapping(value = "payouts-gateway")
@@ -20,7 +20,7 @@ import ru.dreamteam.services.PayoutService;
 public class PayoutController {
 
     private final PayoutService payoutService;
-    private final RestTemplate restTemplate;
+    private final RestTemplateCallService restTemplateCallService;
 
     @Value("${external_host}")
     private String externalHost;
@@ -41,9 +41,9 @@ public class PayoutController {
     private String endpointStatus;
 
     @Autowired
-    public PayoutController(PayoutService payoutService, RestTemplate restTemplate) {
+    public PayoutController(PayoutService payoutService, RestTemplateCallService restTemplateCallService) {
         this.payoutService = payoutService;
-        this.restTemplate = restTemplate;
+        this.restTemplateCallService = restTemplateCallService;
     }
 
     @PostMapping(value = "/payout")
@@ -64,11 +64,10 @@ public class PayoutController {
 
         HttpEntity<?> httpEntity = payoutService.getEntityForRequest(request, PayoutRequestToPlatformDTO.class);
 
-//        How we would normally do
-        ResponseEntity<ResponsePayoutDTO> responsePayoutEntityResponseEntity =
-                restTemplate.postForEntity(externalHost + endpointPayout, httpEntity, ResponsePayoutDTO.class);
+        ResponseEntity<?> responsePayoutEntityResponseEntity =
+                restTemplateCallService.postCallAtPlatform(externalHost + endpointPayout, httpEntity, ResponsePayoutDTO.class);
 
-        return  responsePayoutEntityResponseEntity;
+        return responsePayoutEntityResponseEntity;
     }
 
     @PostMapping(value = "/balance")
@@ -78,9 +77,8 @@ public class PayoutController {
 
         HttpEntity<?> httpEntity = payoutService.getEntityForRequest(request, RequestBalanceDTO.class);
 
-//        How we would normally do
-        ResponseEntity<ResponseBalanceDTO> responseEntity =
-                restTemplate.postForEntity(externalHost + endpointBalance, httpEntity, ResponseBalanceDTO.class);
+        ResponseEntity<?> responseEntity =
+                restTemplateCallService.postCallAtPlatform(externalHost + endpointBalance, httpEntity, ResponseBalanceDTO.class);
 
         return responseEntity;
     }
@@ -92,9 +90,8 @@ public class PayoutController {
 
         HttpEntity<?> httpEntity = payoutService.getEntityForRequest(request, RequestStatusDTO.class);
 
-//        How we would normally do
-        ResponseEntity<ResponseStatusDTO> responseEntity =
-                restTemplate.postForEntity(externalHost + endpointStatus, httpEntity, ResponseStatusDTO.class);
+        ResponseEntity<?> responseEntity =
+                restTemplateCallService.postCallAtPlatform(externalHost + endpointStatus, httpEntity, ResponseStatusDTO.class);
         return responseEntity;
     }
 
